@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>拉麵擬聲詞：ズルズル (中日對照版)</title>
+    
+    <!-- Fonts: Zen Maru Gothic (Cute/Rounded) & Kiwi Maru (Artistic) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@400;500&family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            /* --- Super Colorful Palette --- */
+            
+            /* Background Gradient - Rainbow-ish but soft */
+            --bg-gradient: linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%); 
+            
+            /* Theme Colors for Specific Slides */
+            --theme-purple: #ab47bc;
+            --theme-blue: #29b6f6;
+            --theme-green: #66bb6a;
+            --theme-orange: #ffa726;
+            --theme-red: #ef5350;
+            --theme-teal: #26a69a;
+            --theme-pink: #ec407a;
+
+            /* UI Colors */
+            --card-bg: rgba(255, 255, 255, 0.98);
+            --text-color: #424242;
+            --text-sub: #757575;
+            
+            /* Fonts */
+            --font-title: 'Kiwi Maru', serif;
+            --font-body: 'Zen Maru Gothic', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f0f4f8; /* Fallback */
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(255, 200, 200, 0.3) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(200, 200, 255, 0.3) 0%, transparent 20%),
+                radial-gradient(circle at 50% 50%, rgba(200, 255, 200, 0.2) 0%, transparent 30%);
+            font-family: var(--font-body);
+            color: var(--text-color);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Toolbar (Rainbow Style) --- */
+        .toolbar {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 12px;
+            border-radius: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            border: 2px solid #fff;
+        }
+
+        .tool-btn {
+            width: 50px;
+            height: 50px;
+            border: none;
+            border-radius: 20px;
+            background: #fff;
+            color: #555;
+            cursor: pointer;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Colorful Hover States */
+        #btn-brush:hover, #btn-brush.active { background: #ffecb3; color: #ff6f00; }
+        #btn-eraser:hover, #btn-eraser.active { background: #ffcdd2; color: #c62828; }
+        #btn-text:hover, #btn-text.active { background: #bbdefb; color: #1565c0; }
+        #btn-move:hover, #btn-move.active { background: #c8e6c9; color: #2e7d32; }
+        #btn-print:hover, #btn-print.active { background: #e1bee7; color: #6a1b9a; }
+
+        .tool-btn:hover { transform: scale(1.1) rotate(5deg); }
+        .tool-btn:active { transform: scale(0.95); }
+
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 5px;
+            padding-top: 10px;
+            border-top: 2px dashed #eee;
+        }
+
+        .color-swatch {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+            transition: transform 0.2s;
+        }
+        .color-swatch:hover { transform: scale(1.2); }
+        .color-swatch.active { transform: scale(1.2); border-color: #333; }
+
+        /* --- Slide Container --- */
+        #app-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 100px;
+            position: relative;
+        }
+
+        .slide {
+            width: 100%;
+            max-width: 1100px;
+            height: 100%;
+            max-height: 90vh;
+            aspect-ratio: 16/9;
+            background: var(--card-bg);
+            border-radius: 35px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            position: relative;
+            display: none;
+            overflow: hidden;
+            flex-direction: column;
+            border: 6px solid #fff;
+        }
+
+        .slide.active { display: flex; }
+
+        /* Dynamic Theme Backgrounds per Slide */
+        /* Each slide will have a data-theme attribute in HTML to trigger these */
+        .slide[data-theme="purple"] { border-color: #e1bee7; }
+        .slide[data-theme="purple"] .slide-title { color: var(--theme-purple); }
+        .slide[data-theme="purple"] .situation-tag { background: var(--theme-purple); }
+        .slide[data-theme="purple"] .col-right { background: linear-gradient(135deg, #f3e5f5, #fff); }
+
+        .slide[data-theme="blue"] { border-color: #b3e5fc; }
+        .slide[data-theme="blue"] .slide-title { color: var(--theme-blue); }
+        .slide[data-theme="blue"] .situation-tag { background: var(--theme-blue); }
+        .slide[data-theme="blue"] .col-right { background: linear-gradient(135deg, #e1f5fe, #fff); }
+
+        .slide[data-theme="green"] { border-color: #c8e6c9; }
+        .slide[data-theme="green"] .slide-title { color: var(--theme-green); }
+        .slide[data-theme="green"] .situation-tag { background: var(--theme-green); }
+        .slide[data-theme="green"] .col-right { background: linear-gradient(135deg, #e8f5e9, #fff); }
+        
+        .slide[data-theme="orange"] { border-color: #ffe0b2; }
+        .slide[data-theme="orange"] .slide-title { color: var(--theme-orange); }
+        .slide[data-theme="orange"] .situation-tag { background: var(--theme-orange); }
+        .slide[data-theme="orange"] .col-right { background: linear-gradient(135deg, #fff3e0, #fff); }
+
+        .slide[data-theme="teal"] { border-color: #b2dfdb; }
+        .slide[data-theme="teal"] .slide-title { color: var(--theme-teal); }
+        .slide[data-theme="teal"] .situation-tag { background: var(--theme-teal); }
+        .slide[data-theme="teal"] .col-right { background: linear-gradient(135deg, #e0f2f1, #fff); }
+
+        .slide[data-theme="red"] { border-color: #ffcdd2; }
+        .slide[data-theme="red"] .slide-title { color: var(--theme-red); }
+        .slide[data-theme="red"] .situation-tag { background: var(--theme-red); }
+        .slide[data-theme="red"] .col-right { background: linear-gradient(135deg, #ffebee, #fff); }
+
+
+        /* Canvas & Text Layers */
+        .drawing-layer, .text-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        }
+        .drawing-layer { z-index: 10; cursor: crosshair; touch-action: none; }
+        .text-layer { z-index: 11; pointer-events: none; }
+
+        .user-text {
+            position: absolute;
+            background: rgba(255,255,255,0.9);
+            border: 2px dashed #444;
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-family: var(--font-body);
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #333;
+            pointer-events: auto;
+            cursor: text;
+        }
+        .user-text.draggable { cursor: grab; background: #fff9c4; border-style: solid; }
+
+        /* Slide Content */
+        .slide-content {
+            padding: 35px 50px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            z-index: 1;
+        }
+
+        .slide-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px dotted #ddd;
+        }
+
+        .slide-title {
+            font-family: var(--font-title);
+            font-size: 2.2rem;
+            margin: 0;
+            text-shadow: 2px 2px 0 rgba(0,0,0,0.05);
+        }
+
+        .slide-number {
+            font-family: var(--font-body);
+            font-weight: 700;
+            color: #fff;
+            font-size: 1.1rem;
+            background: #bdbdbd;
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+
+        .slide-body {
+            flex: 1;
+            display: flex;
+            gap: 40px;
+            overflow: hidden;
+        }
+
+        .col-left {
+            flex: 1.1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .col-right {
+            flex: 0.9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 30px;
+            position: relative;
+            border: 5px solid #fff;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.03);
+        }
+
+        /* Scrollbar */
+        .col-left::-webkit-scrollbar { width: 8px; }
+        .col-left::-webkit-scrollbar-track { background: transparent; }
+        .col-left::-webkit-scrollbar-thumb { background-color: #e0e0e0; border-radius: 4px; }
+
+        /* Typography */
+        .big-word {
+            font-family: var(--font-title);
+            font-size: 3.5rem;
+            color: #424242;
+            font-weight: bold;
+            margin-bottom: 5px;
+            line-height: 1.2;
+        }
+
+        .situation-tag {
+            display: inline-block;
+            color: white;
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .definition-box {
+            background: #fff;
+            padding: 15px 20px;
+            border-radius: 15px;
+            border-left: 6px solid #ccc; /* Default, overridden by JS/Theme */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+            margin-bottom: 20px;
+        }
+
+        .def-jp { font-size: 1.2rem; margin-bottom: 5px; color: #333; }
+        .def-tw { font-size: 1rem; color: #757575; font-weight: normal; }
+
+        /* Chat Box */
+        .chat-container {
+            background: #fafafa;
+            border-radius: 20px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: auto;
+            border: 2px solid #eee;
+        }
+
+        .chat-title {
+            font-size: 0.9rem;
+            color: #999;
+            text-align: center;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+
+        .chat-row { display: flex; align-items: flex-start; gap: 10px; }
+        .chat-row.right { flex-direction: row-reverse; }
+
+        .chat-avatar {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem;
+            border: 2px solid #eee;
+        }
+
+        .chat-bubble {
+            max-width: 85%;
+            padding: 10px 15px;
+            border-radius: 18px;
+            font-size: 1.05rem;
+            line-height: 1.4;
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        /* Bubble Colors */
+        .chat-row.left .chat-bubble { background: #fff; color: #333; border-top-left-radius: 4px; }
+        .chat-row.right .chat-bubble { background: #333; color: #fff; border-top-right-radius: 4px; } /* Default, themed later */
+
+        /* Illustration Animation */
+        .illustration {
+            font-size: 8rem;
+            filter: drop-shadow(0 15px 0px rgba(0,0,0,0.1));
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        /* Nav Buttons */
+        .nav-btn {
+            position: fixed; top: 50%; transform: translateY(-50%);
+            background: rgba(255,255,255,0.8);
+            color: #555;
+            width: 60px; height: 60px;
+            border-radius: 50%; border: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            font-size: 1.5rem; cursor: pointer; z-index: 900;
+            transition: all 0.2s;
+            backdrop-filter: blur(5px);
+        }
+        .nav-btn:hover { transform: translateY(-50%) scale(1.1); background: #fff; color: var(--theme-purple); }
+        #prev-btn { left: 40px; }
+        #next-btn { right: 40px; }
+
+        /* --- Print Mode --- */
+        @media print {
+            .toolbar, .nav-btn { display: none !important; }
+            #app-container { padding: 0; }
+            .slide { display: flex !important; break-after: page; height: 100vh; border: none; box-shadow: none; }
+            body { background: white; -webkit-print-color-adjust: exact; }
+        }
+
+        /* --- Colorful Cards Grid --- */
+        .grid-cards {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%;
+        }
+        .mini-card {
+            padding: 20px; border-radius: 20px; text-align: left;
+            transition: transform 0.2s; border: 2px solid transparent;
+            background: #fff;
+        }
+        .mini-card:hover { transform: translateY(-5px); }
+        
+        .card-icon { font-size: 1.5rem; margin-bottom: 10px; display: block; }
+        .card-jp { font-size: 1.2rem; font-weight: bold; display: block; margin-bottom: 5px; }
+        .card-tw { font-size: 0.9rem; opacity: 0.8; }
+
+    </style>
+</head>
+<body>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+        <button class="tool-btn active" id="btn-brush" title="畫筆 (Pen)"><i class="fas fa-pen"></i></button>
+        <button class="tool-btn" id="btn-eraser" title="橡皮擦 (Eraser)"><i class="fas fa-eraser"></i></button>
+        <button class="tool-btn" id="btn-text" title="文字 (Text)"><i class="fas fa-font"></i></button>
+        <button class="tool-btn" id="btn-move" title="移動 (Move)"><i class="fas fa-arrows-alt"></i></button>
+        <button class="tool-btn" id="btn-print" title="列印 (Print)"><i class="fas fa-print"></i></button>
+        
+        <div class="color-palette" id="palette"></div>
+    </div>
+
+    <!-- Navigation -->
+    <button class="nav-btn" id="prev-btn"><i class="fas fa-chevron-left"></i></button>
+    <button class="nav-btn" id="next-btn"><i class="fas fa-chevron-right"></i></button>
+
+    <!-- App Container -->
+    <div id="app-container">
+        
+        <!-- Slide 1: Cover (Purple Theme) -->
+        <div class="slide active" id="slide-1" data-theme="purple">
+            <canvas class="drawing-layer"></canvas><div class="text-layer"></div>
+            <div class="slide-content center-text" style="justify-content: center; text-align: center;">
+                <div class="illustration" style="color: var(--theme-purple); margin-bottom: 20px;">
+                    <i class="fas fa-bowl-food"></i>
+                </div>
+                <h1 style="font-family: var(--font-title); font-size: 3.5rem; color: #333; margin-bottom: 10px;">
+                    ラーメンとオノマトペ<br>
+                    <span style="font-size: 2rem; color: var(--theme-purple);">拉麵與擬聲詞</span>
+                </h1>
+                <h2 style="font-family: var(--font-body); font-size: 1.5rem; color: #757575;">
+                    食べる時の音・食感の表現<br>
+                    <span style="font-size: 1.2rem;">吃麵時的聲音・口感表現</span>
+                </h2>
+                <div style="margin-top: 40px; font-size: 1.2rem; background: var(--theme-purple); padding: 12px 40px; border-radius: 50px; color: white; font-weight: bold; box-shadow: 0 10px 20px rgba(171, 71, 188, 0.3);">
+                    日語會話課程 (日本語会話レッスン)
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Scene (Purple Theme) -->
+        <div class="slide" id="slide-2" data-theme="purple">
+            <canvas class="drawing-layer"></canvas><div class="text-layer"></div>
+            <div class="slide-content">
+                <div class="slide-header">
+                    <h3 class="slide-title">場面：ラーメン屋 <small style="font-size:0.6em; color:#888;">(場面：拉麵店)</small></h3>
+                    <span class="slide-number">02 / 10</span>
+                </div>
+                <div class="slide-body">
+                    <div class="col-left">
+                        <p style="font-size: 1.3rem; line-height: 1.8;">
+                            日本の食文化において、「音」はとても大切です。<br>
+                            <span style="color:#757575; font-size: 1.1rem;">在日本飲食文化中，「聲音」非常重要。</span><br><br>
+                            今日は、ラーメン屋さんでよく使う・聞くオノマトペを勉強しましょう。<br>
+                            <span style="color:#757575; font-size: 1.1rem;">今天我們來學習在拉麵店常用、常聽到的擬聲詞吧。</span>
+                        </p>
+                        
+                        <h4 style="color: var(--theme-purple); margin-top: 20px; font-size: 1.3rem;">今日的學習重點 (今日のポイント)：</h4>
+                        <ul style="font-size: 1.2rem; list-style: none; padding: 0; line-height: 2;">
+                            <li style="background:#e1f5fe; padding:5px 15px; border-radius:15px; margin-bottom:10px; color:#0277bd;">
+                                <i class="fas fa-volume-up"></i> <strong>ズルズル</strong> (Zuru-zuru) - 吸麵聲
+                            </li>
+                            <li style="background:#e8f5e9; padding:5px 15px; border-radius:15px; margin-bottom:10px; color:#2e7d32;">
+                                <i class="fas fa-star"></i> <strong>ツルツル</strong> (Tsuru-tsuru) - 滑溜口感
+                            </li>
+                            <li style="background:#e0f2f1; padding:5px 15px; border-radius:15px; margin-bottom:10px; color:#00695c;">
+                                <i class="fas fa-wind"></i> <strong>フーフー</strong> (Fuu-fuu) - 吹氣冷卻
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-right">
+                        <i class="fas fa-store-alt illustration" style="color: var(--theme-purple);"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Zuru-zuru (Blue Theme) -->
+        <div class="slide" id="slide-3" data-theme="blue">
+            <canvas class="drawing-layer"></canvas><div class="text-layer"></div>
+            <div class="slide-content">
+                <div class="slide-header">
+                    <h3 class="slide-title">音を立てて吸う <small style="font-size:0.6em; color:#888;">(發出聲音吸麵)</small></h3>
+                    <span class="slide-number">03 / 10</span>
+                </div>
+                <div class="slide-body">
+                    <div class="col-left">
+                        <div class="big-word" style="color: var(--theme-blue);">ズルズル</div>
+                        <div class="situation-tag">場面：ラーメンを食べる時 (吃拉麵時)</div>
+                        
+                        <div class="definition-box" style="border-left-color: var(--theme-blue);">
+                            <div class="def-jp">麺を勢いよく吸い込む音。日本では、ラーメンやそばを食べる時、この音を立てても大丈夫です。</div>
+                            <div class="def-tw">用力吸入麵條的聲音。在日本吃拉麵或蕎麥麵時，發出這個聲音是沒問題的。</div>
+                        </div>
+                        
+                        <!-- Chat -->
+                        <div class="chat-container">
+                            <div class="chat-title">會話 (会話)</div>
+                            <div class="chat-row left">
+                                <div class="chat-avatar" style="color:var(--theme-blue);"><i class="fas fa-user"></i></div>
+                                <div class="chat-bubble">
+                                    わあ、いい音だね！<br>
+                                    <span style="font-size:0.8em; color:#888;">哇，好棒的聲音！</span>
+                                </div>
+                            </div>
+                            <div class="chat-row right">
+                                <div class="chat-bubble" style="background:var(--theme-blue);">
+                                    うん、こうやって<strong>ズルズル</strong>吸うと、香りが広がるんだよ。<br>
+                                    <span style="font-size:0.8em; opacity:0.8;">嗯，像這樣ズルズル地吸，香氣會擴散開來喔。</span>
+                                </div>
+                                <div class="chat-avatar" style="color:var(--theme-blue);"><i class="fas fa-smile"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-right">
+                        <i class="fas fa-wind illustration" style="color: var(--theme-blue);"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Tsuru-tsuru (Green Theme) -->
+        <div class="slide" id="slide-4" data-theme="green">
+            <canvas class="drawing-layer"></canvas><div class="text-layer"></div>
+            <div class="slide-content">
+                <div class="slide-header">
+                    <h3 class="slide-title">なめらかな食感 <small style="font-size:0.6em; color:#888;">(滑溜的口感)</small></h3>
+                    <span class="slide-number">04 / 10</span>
+                </div>
+                <div class="slide-body">
+                    <div class="col-left">
+                        <div class="big-word" style="color: var(--theme-green);">ツルツル</div>
+                        <div class="situation-tag">場面：食感の感想 (口感的感想)</div>
+                        
+                        <div class="definition-box" style="border-left-color: var(--theme-green);">
+                            <div class="def-jp">麺の表面がなめらかで、口の中にすべり込んでくる様子。うどんや冷麺によく使います。</div>
+                            <div class="def-tw">麵條表面光滑，滑入口中的感覺。常用於形容烏龍麵或冷麵。</div>
+                        </div>
+                        
+                        <!-- Chat -->
+                        <div class="chat-container">
+                            <div class="chat-title">會話 (会話)</div>
+                            <div class="chat-row left">
+                                <div class="chat-avatar" style="color:var(--theme-green);"><i class="fas fa-user"></i></div>
+                                <div class="chat-bubble">
+                                    ここのうどん、どう？<br>
+                                    <span style="font-size:0.8em; color:#888;">這裡的烏龍麵如何？</span>
+                                </div>
+                            </div>
+                            <div class="chat-row right">
+                                <div class="chat-bubble" style="background:var(--theme-green);">
+                                    おいしい！麺が<strong>ツルツル</strong>していて、のどごし最高だよ。<br>
+                                    <span style="font-size:0.8em; opacity:0.8;">好吃！麵條很滑溜(ツルツル)，入喉感最棒了。</span>
+                                </div>
+                                <div class="chat-avatar" style="color:var(--theme-green);"><i class="fas fa-smile"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-right">
+                        <i class="fas fa-wave-square illustration" style="color: var(--theme-green);"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Fuu-fuu (Teal Theme) -->
+        <div class="slide" id="slide-5" data-theme="teal">
+            <canvas class="drawing-layer"></canvas><div class="text-layer"></div>
+            <div class="slide-content">
+                <div class="slide-header">
+                    <h3 class="slide-title">息を吹きかける <small style="font-size:0.6em; color:#888;">(吹氣冷卻)</small></h3>
+                    <span class="slide-number">05 / 10</span>
+                </div>
+                <div class="slide-body">
+                    <div class="col-left">
+                        <div class="big-word" style="color: var(--theme-teal);">フーフー</div>
+                        <div class="situation-tag">場面：熱いものを食べる前 (吃熱食前)</div>
+                        
+                        <div class="definition-box" style="border-left-color: var(--theme-teal);">
+                            <div class="def-jp">食べ物を冷ますために、息を吹きかける動作や音。猫舌（ねこじた）の人には必須です。</div>
+                            <div class="def-tw">為了讓食物變涼而吹氣的動作或聲音。怕燙的人（貓舌頭）必備。</div>
+                        </div>
+                        
+                        <!-- Chat -->
+                        <div class="chat-container">
+                            <div class="chat-title">會話 (会話)</div>
+                            <div class="chat-row left">
+                                <div class="chat-avatar" style="color:var(--theme-teal);"><i class="fas fa-user"></i></div>
+                                <div class="chat-bubble">
+                                    熱っ！やけどしちゃった。<br>
+                                    <span style="font-size:0.8em; color:#888;">好燙！燙到了。</span>
+                                </div>
+                            </div>
+                            <div class="chat-row right">
+                                <div class="chat-bubble" style="background:var(--theme-teal);">
+                                    大丈夫？ちゃんと<strong>フーフー</strong>してから食べなきゃ。<br>
+                                    <span style="font-size:0.8em; opacity:0.8;">還好嗎？要好好吹涼(フーフー)再吃才行。</span>
+                                </div>
+                                <div class="chat-avatar" style="color:var(--theme-teal);"><i class="fas fa-smile"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-right">
+                        <i class="fas fa-breath illustration" style="color: var(--theme-teal);"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Hafu-hafu (Orange Theme) -->
+        <div class="slide" id="slide-6" data-theme="orange">
+            <canvas class="drawing-layer"></canvas><div class="text-layer"></div>
+            <div class="slide-content">
+                <div class="slide-header">
+                    <h3 class="slide-title">熱くてたまらない <small style="font-size:0.6em; color:#888;">(熱得受不了)</small></h3>
+                    <span class="slide-number">06 / 10</span>
+                </div>
+                <div class="slide-body">
+                    <div class="col-left">
+                        <div class="big-word" style="color: var(--theme-orange);">ハフハフ</div>
+                        <div class="situation-tag">場面：口の中が熱い時 (口中很燙時)</div>
+                        
+                        <div class="definition-box" style="border-left-color: var(--theme-orange);">
+                            <div class="def-jp">熱いものを口に入れて、冷ますために息を吐く様子。冬に肉まんやたこ焼きを食べる時によく見ます。</div>
+                            <div class="def-tw">把熱食放進口中後，為了降溫而哈氣的樣子。冬天吃肉包或章魚燒時常見。</div>
+                        </div>
+                        
+                        <!-- Chat -->
+                        <div class="chat-container">
+                            <div class="chat-title">會話 (会話)</div>
+                            <div class="chat-row left">
+                                <div class="chat-avatar" style="color:var(--theme-orange);"><i class="fas fa-user"></i></div>
+                                <div class="chat-bubble">
+                                    このたこ焼き、焼きたてだよ。<br>
+                                    <span style="font-size:0.8em; color:#888;">這章魚燒是剛烤好的喔。</span>
+                                </div>
+                            </div>
+                            <div class="chat-row right">
+                                <div class="chat-bubble" style="background:var(--theme-orange);">
+                                    ん！んぐ！<strong>ハフハフ</strong>...熱い！<br>
+                                    <span style="font-size:0.8em; opacity:0.8;">嗯！嗚！(呼氣)...好燙！</span>
+                                </div>
+                                <div class="chat-avatar" style="color:var(--theme-orange);"><i class="fas fa-smile"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-right">
+                        <i class="fas fa-fire-burner illustration" style="color: var(--theme-orange);"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Goku-goku (Blue Theme) -->
+        <div class="slide" id="slide-7" data-theme="blue">
+            <canvas class="drawing-layer"></canvas><div class="text-layer"></div>
+            <div class="slide-content">
+                <div class="slide-header">
+                    <h3 class="slide-title">スープを飲み干す <small style="font-size:0.6em; color:#888;">(喝乾湯頭)</small></h3>
+                    <span class="slide-number">07 / 10</span>
+                </div>
+                <div class="slide-body">
+                    <div class="col-left">
+                        <div class="big-word" style="color: #0288d1;">ゴクゴク</div>
+                        <div class="situation-tag" style="background:#0288d1;">場面：スープや水を飲む (喝湯或水)</div>
+                        
+                        <div class="definition-box" style="border-left-color: #0288d1;">
+                            <div class="def-jp">喉を鳴らして、勢いよく飲む音。ラーメンのスープや、お風呂上がりの牛乳など。</div>
+                            <div class="def-tw">喉嚨發出聲響，大口喝下的聲音。如喝拉麵湯，或洗澡後喝牛奶。</div>
+                        </div>
+                        
+                        <!-- Chat -->
+                        <div class="chat-container">
+                            <div class="chat-title">會話 (会話)</div>
+                            <div class="chat-row left">
+                                <div class="chat-avatar" style="color:#0288d1;"><i class="fas fa-user"></i></div>
+                                <div class="chat-bubble">
+                                    うわ、スープまで全部飲んだの？<br>
+                                    <span style="font-size:0.8em; color:#888;">哇，連湯都喝光了嗎？</span>
+                                </div>
+                            </div>
+                            <div class="chat-row right">
+                                <div class="chat-bubble" style="background:#0288d1;">
+                                    美味しくて<strong>ゴクゴク</strong>飲んじゃった。<br>
+                                    <span style="font-size:0.8em; opacity:0.8;">太好喝了，忍不住咕嚕咕嚕地喝掉了。</span>
+                                </div>
+                                <div class="chat-avatar" style="color:#0288d1;"><i class="fas fa-smile"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-right">
+                        <i class="fas fa-glass-water illustration" style="color: #0288d1;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Kucha-kucha (Red Theme) -->
+        <div class="slide" id="slide-8" data-theme="red">
+            <canvas class="drawing-layer"></canvas><div class="text-layer"></div>
+            <div class="slide-content">
+                <div class="slide-header">
+                    <h3 class="slide-title" style="color: var(--theme-red);">⚠️ マナー違反の音 <small style="font-size:0.6em; color:#888;">(違反禮儀的聲音)</small></h3>
+                    <span class="slide-number">08 / 10</span>
+                </div>
+                <div class="slide-body">
+                    <div class="col-left">
+                        <div class="big-word" style="color: var(--theme-red);">クチャクチャ</div>
+                        <div class="situation-tag" style="background:var(--theme-red)">場面：絶対にダメ (絕對NG)</div>
+                        
+                        <div class="definition-box" style="border-left-color: var(--theme-red); background: #ffebee;">
+                            <div class="def-jp">口を開けて噛む時の不快な音。「ズルズル（吸う音）」はOKですが、「クチャクチャ（噛む音）」は日本でもマナー違反です。</div>
+                            <div class="def-tw">張著嘴咀嚼時的不快聲音。「ズルズル（吸麵聲）」是OK的，但「クチャクチャ（咀嚼聲）」在日本也是違反禮儀的。</div>
+                        </div>
+                        
+                        <!-- Chat -->
+                        <div class="chat-container" style="border-color: var(--theme-red);">
+                            <div class="chat-title" style="color:#ef5350;">警告 (注意)</div>
+                            <div class="chat-row left">
+                                <div class="chat-avatar" style="color:var(--theme-red);"><i class="fas fa-user"></i></div>
+                                <div class="chat-bubble">
+                                    ねえ、口を閉じて食べてくれない？<br>
+                                    <span style="font-size:0.8em; color:#888;">那個，可以閉著嘴巴吃嗎？</span>
+                                </div>
+                            </div>
+                            <div class="chat-row right">
+                                <div class="chat-bubble" style="background:var(--theme-red);">
+                                    えっ、なんで？<br>
+                                    <span style="font-size:0.8em; opacity:0.8;">咦，為什麼？</span>
+                                </div>
+                                <div class="chat-avatar" style="color:var(--theme-red);"><i class="fas fa-question"></i></div>
+                            </div>
+                            <div class="chat-row left">
+                                <div class="chat-avatar" style="color:var(--theme-red);"><i class="fas fa-user"></i></div>
+                                <div class="chat-bubble">
+                                    <strong>クチャクチャ</strong>音がして、行儀が悪いよ。<br>
+                                    <span style="font-size:0.8em; color:#888;">發出咀嚼聲，很沒規矩喔。</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-right" style="background: #ffebee;">
+                        <div style="text-align: center;">
+                            <i class="fas fa-ban illustration" style="color: var(--theme-red);"></i>
+                            <p style="margin-top:20px; font-weight:bold; color: var(--theme-red); font-size: 1.5rem;">NG!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Review Quiz (Pink Theme) -->
+        <div class="slide" id="slide-9" data-theme="purple">
+            <canvas class="drawing-layer"></canvas><div class="text-layer"></div>
+            <div class="slide-content">
+                <div class="slide-header">
+                    <h3 class="slide-title">練習問題 <small style="font-size:0.6em; color:#888;">(練習題)</small></h3>
+                    <span class="slide-number">09 / 10</span>
+                </div>
+                <div class="slide-body" style="flex-direction: column;">
+                    <p style="text-align: center; color: #555; font-size: 1.2rem;">
+                        ペンツールを使って、正しい言葉を書きましょう！<br>
+                        <span style="font-size:1rem; color:#888;">請使用畫筆工具填入正確的詞彙！</span>
+                    </p>
+                    
+                    <div class="grid-cards">
+                        <!-- Card 1 -->
+                        <div class="mini-card" style="background:#e1f5fe; border-color:#81d4fa;">
+                            <span class="card-icon" style="color:#0288d1;"><i class="fas fa-wind"></i></span>
+                            <span class="card-jp">ラーメンを吸う音</span>
+                            <span class="card-tw">吸拉麵的聲音</span>
+                            <div style="margin-top:10px; font-weight:bold; font-size:1.5rem; color:#0277bd;">「_______」</div>
+                        </div>
+                        <!-- Card 2 -->
+                        <div class="mini-card" style="background:#ffe0b2; border-color:#ffcc80;">
+                            <span class="card-icon" style="color:#f57c00;"><i class="fas fa-fire-burner"></i></span>
+                            <span class="card-jp">熱くて息を吐く</span>
+                            <span class="card-tw">太燙而呼氣</span>
+                            <div style="margin-top:10px; font-weight:bold; font-size:1.5rem; color:#e65100;">「_______」</div>
+                        </div>
+                        <!-- Card 3 -->
+                        <div class="mini-card" style="background:#ffcdd2; border-color:#ef9a9a;">
+                            <span class="card-icon" style="color:#c62828;"><i class="fas fa-ban"></i></span>
+                            <span class="card-jp">口を開けて噛む</span>
+                            <span class="card-tw">張口咀嚼 (NG)</span>
+                            <div style="margin-top:10px; font-weight:bold; font-size:1.5rem; color:#b71c1c;">「_______」</div>
+                        </div>
+                        <!-- Card 4 -->
+                        <div class="mini-card" style="background:#e8f5e9; border-color:#a5d6a7;">
+                            <span class="card-icon" style="color:#2e7d32;"><i class="fas fa-wave-square"></i></span>
+                            <span class="card-jp">麺がなめらか</span>
+                            <span class="card-tw">麵條滑溜</span>
+                            <div style="margin-top:10px; font-weight:bold; font-size:1.5rem; color:#1b5e20;">「_______」</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 20px; text-align: center; color: #757575;">
+                        選擇：ツルツル、クチャクチャ、ズルズル、ハフハフ
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Conclusion (Purple Theme) -->
+        <div class="slide" id="slide-10" data-theme="purple">
+            <canvas class="drawing-layer"></canvas><div class="text-layer"></div>
+            <div class="slide-content center-text" style="justify-content: center; text-align: center;">
+                <div style="font-size: 6rem; color: var(--theme-purple); margin-bottom: 20px;">
+                    <i class="fas fa-check-double"></i>
+                </div>
+                <h2 style="font-family: var(--font-title); font-size: 3rem; color: #333; margin-bottom: 5px;">
+                    ごちそうさまでした！
+                </h2>
+                <h3 style="font-size: 1.5rem; color: #757575; font-weight: normal; margin-bottom: 30px;">
+                    (多謝款待！)
+                </h3>
+                
+                <div style="width: 85%; text-align: left; background: #fff; padding: 30px; border-radius: 20px; border: 2px dashed #e1bee7; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
+                    <h3 style="color: var(--theme-purple); border-bottom: 1px solid #eee; padding-bottom: 10px; margin-top:0;">總結 (まとめ)：</h3>
+                    <ul style="font-size: 1.2rem; line-height: 2.2; list-style: none; padding-left: 0;">
+                        <li><span style="color:#29b6f6;">⭕ <strong>ズルズル</strong></span>：吸麵聲 (Slurping)</li>
+                        <li><span style="color:#66bb6a;">⭕ <strong>ツルツル</strong></span>：滑溜口感 (Smooth)</li>
+                        <li><span style="color:#26a69a;">⭕ <strong>フーフー</strong></span>：吹涼 (Blowing)</li>
+                        <li><span style="color:#ef5350;">❌ <strong>クチャクチャ</strong></span>：咀嚼聲 (Chewing noise - NG!)</li>
+                    </ul>
+                </div>
+                <p style="margin-top: 30px; font-weight: bold; font-size: 1.3rem; color: var(--theme-purple);">
+                    今度ラーメンを食べる時は、「ズルズル」と音を立ててみましょう！<br>
+                    <span style="font-size: 1rem; color: #757575; font-weight: normal;">下次吃拉麵時，試著發出「ズルズル」的聲音吧！</span>
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- State Management ---
+        const state = {
+            currentSlide: 1,
+            totalSlides: 10,
+            tool: 'brush', // brush, eraser, text, move
+            color: '#333333',
+            isDrawing: false,
+            lastX: 0,
+            lastY: 0,
+            brushSize: 4
+        };
+
+        // --- Elements ---
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const palette = document.getElementById('palette');
+        const appContainer = document.getElementById('app-container');
+
+        // --- Colors Palette (Expanded) ---
+        const colors = [
+            '#000000', '#333333', '#5d4037', // Grayscale/Brown
+            '#e53935', '#d81b60', '#8e24aa', // Reds/Purples
+            '#3949ab', '#1e88e5', '#039be5', // Blues
+            '#00acc1', '#00897b', '#43a047', // Greens
+            '#7cb342', '#c0ca33', '#fdd835', // Yellow/Lime
+            '#ffb300', '#fb8c00', '#f4511e'  // Oranges
+        ];
+
+        function init() {
+            setupNavigation();
+            setupPalette();
+            setupTools();
+            setupCanvasForSlide(1);
+            setupTextLayer(1);
+            updateSlideVisibility();
+            
+            window.addEventListener('resize', () => resizeCanvas(state.currentSlide));
+        }
+
+        // --- Navigation ---
+        function setupNavigation() {
+            prevBtn.addEventListener('click', () => changeSlide(-1));
+            nextBtn.addEventListener('click', () => changeSlide(1));
+            
+            document.getElementById('btn-print').addEventListener('click', () => {
+                slides.forEach((slide, index) => resizeCanvas(index + 1));
+                window.print();
+            });
+        }
+
+        function changeSlide(direction) {
+            const next = state.currentSlide + direction;
+            if (next >= 1 && next <= state.totalSlides) {
+                state.currentSlide = next;
+                updateSlideVisibility();
+                setupCanvasForSlide(next);
+                setupTextLayer(next);
+            }
+        }
+
+        function updateSlideVisibility() {
+            slides.forEach((slide, index) => {
+                slide.classList.toggle('active', index + 1 === state.currentSlide);
+            });
+            prevBtn.style.opacity = state.currentSlide === 1 ? '0.5' : '1';
+            prevBtn.style.pointerEvents = state.currentSlide === 1 ? 'none' : 'auto';
+            nextBtn.style.opacity = state.currentSlide === state.totalSlides ? '0.5' : '1';
+            nextBtn.style.pointerEvents = state.currentSlide === state.totalSlides ? 'none' : 'auto';
+        }
+
+        // --- Palette & Tools ---
+        function setupPalette() {
+            colors.forEach(color => {
+                const swatch = document.createElement('div');
+                swatch.className = 'color-swatch';
+                swatch.style.backgroundColor = color;
+                swatch.addEventListener('click', () => setColor(color, swatch));
+                palette.appendChild(swatch);
+            });
+            // Set default active color (black/dark grey)
+            palette.children[1].classList.add('active');
+            state.color = colors[1];
+        }
+
+        function setColor(color, element) {
+            state.color = color;
+            document.querySelectorAll('.color-swatch').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+            if (state.tool === 'eraser') setTool('brush');
+        }
+
+        function setupTools() {
+            const tools = {
+                'btn-brush': 'brush',
+                'btn-eraser': 'eraser',
+                'btn-text': 'text',
+                'btn-move': 'move'
+            };
+            for (const [id, toolName] of Object.entries(tools)) {
+                document.getElementById(id).addEventListener('click', () => setTool(toolName));
+            }
+        }
+
+        function setTool(toolName) {
+            state.tool = toolName;
+            document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-${toolName}`).classList.add('active');
+            updateLayerInteractions();
+        }
+
+        function updateLayerInteractions() {
+            const activeSlide = document.getElementById(`slide-${state.currentSlide}`);
+            const canvas = activeSlide.querySelector('.drawing-layer');
+            const textLayer = activeSlide.querySelector('.text-layer');
+
+            if (state.tool === 'brush' || state.tool === 'eraser') {
+                canvas.style.pointerEvents = 'auto';
+                textLayer.style.pointerEvents = 'none';
+                canvas.style.cursor = 'crosshair';
+            } else if (state.tool === 'text') {
+                canvas.style.pointerEvents = 'none';
+                textLayer.style.pointerEvents = 'auto';
+                textLayer.style.cursor = 'text';
+            } else if (state.tool === 'move') {
+                canvas.style.pointerEvents = 'none';
+                textLayer.style.pointerEvents = 'auto';
+                textLayer.style.cursor = 'default';
+            }
+        }
+
+        // --- Canvas Drawing ---
+        function setupCanvasForSlide(slideIndex) {
+            const slide = document.getElementById(`slide-${slideIndex}`);
+            const canvas = slide.querySelector('.drawing-layer');
+            if (canvas.width !== slide.clientWidth) resizeCanvas(slideIndex);
+            
+            const ctx = canvas.getContext('2d');
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            if (!canvas.dataset.listenersAdded) {
+                canvas.addEventListener('mousedown', startDrawing);
+                canvas.addEventListener('mousemove', draw);
+                canvas.addEventListener('mouseup', stopDrawing);
+                canvas.addEventListener('mouseout', stopDrawing);
+                canvas.dataset.listenersAdded = 'true';
+            }
+        }
+
+        function resizeCanvas(slideIndex) {
+            const slide = document.getElementById(`slide-${slideIndex}`);
+            const canvas = slide.querySelector('.drawing-layer');
+            const ctx = canvas.getContext('2d');
+
+            let tempCanvas;
+            if (canvas.width > 0 && canvas.height > 0) {
+                 tempCanvas = document.createElement('canvas');
+                 tempCanvas.width = canvas.width;
+                 tempCanvas.height = canvas.height;
+                 tempCanvas.getContext('2d').drawImage(canvas, 0, 0);
+            }
+
+            canvas.width = slide.clientWidth;
+            canvas.height = slide.clientHeight;
+
+            if (tempCanvas) {
+                ctx.drawImage(tempCanvas, 0, 0, canvas.width, canvas.height);
+            }
+        }
+
+        function startDrawing(e) {
+            if (state.tool !== 'brush' && state.tool !== 'eraser') return;
+            state.isDrawing = true;
+            const rect = e.target.getBoundingClientRect();
+            state.lastX = e.clientX - rect.left;
+            state.lastY = e.clientY - rect.top;
+        }
+
+        function draw(e) {
+            if (!state.isDrawing) return;
+            const ctx = e.target.getContext('2d');
+            const rect = e.target.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            ctx.lineWidth = state.tool === 'eraser' ? 20 : state.brushSize;
+            ctx.strokeStyle = state.tool === 'eraser' ? 'rgba(0,0,0,1)' : state.color;
+            ctx.globalCompositeOperation = state.tool === 'eraser' ? 'destination-out' : 'source-over';
+
+            ctx.beginPath();
+            ctx.moveTo(state.lastX, state.lastY);
+            ctx.lineTo(x, y);
+            ctx.stroke();
+
+            state.lastX = x;
+            state.lastY = y;
+        }
+
+        function stopDrawing() { state.isDrawing = false; }
+
+        // --- Text Tool ---
+        function setupTextLayer(slideIndex) {
+            const slide = document.getElementById(`slide-${slideIndex}`);
+            const textLayer = slide.querySelector('.text-layer');
+            if (!textLayer.dataset.listenersAdded) {
+                textLayer.addEventListener('click', (e) => {
+                    if (state.tool === 'text' && e.target === textLayer) {
+                        createTextField(e.offsetX, e.offsetY, textLayer);
+                    }
+                });
+                textLayer.dataset.listenersAdded = 'true';
+            }
+        }
+
+        function createTextField(x, y, container) {
+            const div = document.createElement('div');
+            div.className = 'user-text';
+            div.contentEditable = true;
+            div.style.left = x + 'px';
+            div.style.top = y + 'px';
+            div.style.color = state.color;
+            div.innerHTML = ''; 
+            
+            div.addEventListener('mousedown', (e) => {
+                if (state.tool === 'move') {
+                    e.preventDefault(); 
+                    initDrag(e, div);
+                } else {
+                    e.stopPropagation();
+                }
+            });
+
+            container.appendChild(div);
+            setTimeout(() => div.focus(), 0);
+            div.addEventListener('blur', () => {
+                if(div.innerText.trim() === '') div.remove();
+            });
+        }
+
+        function initDrag(e, el) {
+            el.classList.add('draggable');
+            const startX = e.clientX;
+            const startY = e.clientY;
+            const rect = el.getBoundingClientRect();
+            const parentRect = el.parentElement.getBoundingClientRect();
+            const offsetX = startX - rect.left;
+            const offsetY = startY - rect.top;
+
+            function onMouseMove(moveEvent) {
+                const newX = moveEvent.clientX - parentRect.left - offsetX;
+                const newY = moveEvent.clientY - parentRect.top - offsetY;
+                el.style.left = newX + 'px';
+                el.style.top = newY + 'px';
+            }
+
+            function onMouseUp() {
+                el.classList.remove('draggable');
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+            }
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+        }
+
+        init();
+    </script>
+</body>
+</html>
